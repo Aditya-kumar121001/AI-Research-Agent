@@ -11,7 +11,11 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
-
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
 const tools = {
   search: performSearch,
   summarize,
@@ -21,7 +25,8 @@ const tools = {
 };
 
 async function runResearch(topic) {
-  const state = new ResearchState(topic);
+  const state = new ResearchState();
+  state.topic = topic
   let nextStep = "generate_query";
   while (nextStep !== "stop") {
     if (nextStep === "generate_query") {
@@ -30,7 +35,11 @@ async function runResearch(topic) {
       nextStep = await tools[nextStep](state);
     }
   }
-  return state.currentSummary || "No summary generated";
+  return {
+    topic: state.topic,
+    summary: state.currentSummary,
+    sources: state.sources
+  } || "No summary generated";
 }
 
 app.post('/research', async (req, res) => {
@@ -39,7 +48,9 @@ app.post('/research', async (req, res) => {
   if (!topic) return res.status(400).json({ error: "Topic required" });
   try {
     const result = await runResearch(topic);
-    res.json({ summary: result });
+    console.log(result)
+    //console.log(`Final response to bot : ${state.topic}, ${state.currentSummary}, ${state.sources}`)
+    res.json(result);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Research failed" });
