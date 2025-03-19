@@ -6,7 +6,7 @@ Research-Agent is an AI-powered research assistant that helps users generate top
 
 **Speech Recognition:** Convert spoken queries into text and fetch research summaries.
 
-**Chatbot Interface: **Engaging UI for users to interact with the research agent.
+**Chatbot Interface:** Engaging UI for users to interact with the research agent.
 
 **Progress Updates:** Provides real-time status updates on research progress.
 
